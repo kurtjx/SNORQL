@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Snorql: A SPARQL Explorer</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="prototype.js"></script>
+    <script type="text/javascript" src="scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="sparql.js"></script>
+    <script type="text/javascript" src="namespaces.js"></script>
+    <script type="text/javascript" src="snorql.js"></script>
+    <script type="text/javascript" src="sm2/soundmanager2.js"></script>
+    <script type="text/javascript" src="sm2/inlineplayer.js"></script>
+  </head>
+
+  <body class="snorql" onload="snorql.start()">
+    <div id="header">
+      <h1 id="title">Snorql: A SPARQL Explorer</h1>
+    </div>
+
+    <div class="section" style="float: right; width: 8em">
+      <h2>Browse:</h2>
+      <ul>
+        <li><a class="graph-link" href="?browse=classes">Classes</a></li>
+        <li><a class="graph-link" href="?browse=properties">Properties</a></li>
+	<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fg+WHERE+{+GRAPH+%3Fg+{+%3Fx+%3Fy+%3Fz+}+}">Graphs</a></li>
+	<li><a class="graph-link" 
+href="?query=SELECT+DISTINCT+%3Fcomposer_name+%3Ftrack_title+%3Faudio+WHERE+{%0D%0A++%3Ftrack+mo%3Aavailable_as+%3Faudio+.%0D%0A++%3Ftrack+ov%3Acomposer+%3Fcomposer+.+%0D%0A++%3Fcomposer+foaf%3Aname+%3Fcomposer_name+.+%0D%0A++%3Ftrack+dc%3Atitle+%3Ftrack_title+.%0D%0A}%0D%0Alimit+100">List 
+Tracks</a></li>
+        <li id="browse-named-graphs-link"><a href="?browse=graphs">Named Graphs</a></li>
+      </ul>
+	<br/>
+	<h2>MuSim:</h2>
+		<ul>
+			<li><a class="graph-link" href="?query=SELECT+DISTINCT+*+WHERE+%7B+%3Fmethod+a+%3Chttp%3A%2F%2Fpurl.org%2Fontology%2Fsimilarity%2FAssociationMethod%3E+%7D">Association Methods</a></li>
+		<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fdist+%3Fcomposer_name+%3Ftitle+%3Faf+WHERE%0D%0A%7B%0D%0A%23+find+similarity+statements+involving+timbre%0D%0A%3Fs+sim%3Amethod+%3Chttp%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fmv-timbre-sim%3E+%3B%0D%0A++%23+set+the+URI+for+the+seed+track%0D%0A++sim%3Aelement+%3Chttp%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F216%3E+%3B%0D%0A++sim%3Aelement+%3Ftrack+%3B%0D%0A++sim%3Adistance+%3Fdist+.%0D%0A%3Ftrack+mo%3Aavailable_as+%3Faf+%3B%0D%0A++dc%3Atitle+%3Ftitle+%3B%0D%0A++ov%3Acomposer+%3Fcomposer+.%0D%0A%3Fcomposer+foaf%3Aname+%3Fcomposer_name+.%0D%0A%0D%0A%23+only+return+results+with+a+distance+less+than+2.0%0D%0AFILTER+%28+xsd%3Afloat%28%3Fdist%29+%3C+%222.0%22%5E%5Exsd%3Afloat+%29+.%0D%0A%23+remove+the+seed+track+from+the+results%0D%0AFILTER+%28%21regex%28str%28%3Ftrack%29%2C+%22http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F216%22%29%29%0D%0A%0D%0A%7D%0D%0AORDER+BY+ASC+%28%3Fdist%29">
+	Similar tracks (timbre)</a></li>
+		<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fname+%3Finfluencer%0D%0A%0D%0AWHERE+%7B+%0D%0A%3Fsim+sim%3Amethod+%3Chttp%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fcmn-influence%3E+%3B%0D%0A++sim%3Aobject+%3Chttp%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fartist%2Fbe50643c-0377-4968-b48c-47e06b2e2a3b%3E+%3B%0D%0A++sim%3Asubject+%3Finfluencer+.%0D%0A%3Finfluencer+foaf%3Aname+%3Fname+.%0D%0A%7D">
+	Influenced Debussy</a></li>
+		<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fdist+%3Fcomposer_name+%3Ftitle+%3Faf+WHERE%0D%0A%7B%0D%0A%23+find+similarity+statements+involving+timbre+with+the+seed+track%0D%0A%3Fs+sim:method+%3Chttp://classical.catfishsmooth.net/resource/mv-timbre-sim%3E+;%0D%0A++sim:element+%3Chttp://classical.catfishsmooth.net/resource/track/216%3E;%0D%0A++sim:element+%3Ftrack+;%0D%0A++sim:distance+%3Fdist+.%0D%0A%3Ftrack+mo:available_as+%3Faf+;%0D%0A++dc:title+%3Ftitle+;%0D%0A++ov:composer+%3Fcomposer+.%0D%0A%3Fcomposer+foaf:name+%3Fcomposer_name+.%0D%0A%0D%0A%23+must+have+same+key+as+well%0D%0A%3Fs2+sim:method+%3Chttp://classical.catfishsmooth.net/resource/same-key-sim%3E+;%0D%0A++sim:element+%3Chttp://classical.catfishsmooth.net/resource/track/216%3E;%0D%0A++sim:element+%3Ftrack+.%0D%0A%0D%0A%23+only+return+results+with+a+distance+less+than+2.0%0D%0AFILTER+%28+xsd:float%28%3Fdist%29+%3C+%228.0%22%5E%5Exsd:float+%29+.%0D%0A%23+remove+the+seed+track+from+the+results%0D%0AFILTER+%28%21regex%28str%28%3Ftrack%29,+%22http://classical.catfishsmooth.net/resource/track/216%22%29%29%0D%0A%0D%0A%0D%0A%7D%0D%0AORDER+BY+ASC+%28%3Fdist%29">
+	Similar timbre and key</a></li>
+		<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fdist+%3Fcomposer_name+%3Ftitle+%3Faf+WHERE%0D%0A{%0D%0A%23+find+similarity+statements+involving+timbre+with+the+seed+track%0D%0A%3Fs+sim%3Amethod+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fmv-timbre-sim>+%3B%0D%0A++sim%3Aelement+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F362>+%3B%0D%0A++sim%3Aelement+%3Ftrack+%3B%0D%0A++sim%3Adistance+%3Fdist+.%0D%0A%3Ftrack+mo%3Aavailable_as+%3Faf+%3B%0D%0A++dc%3Atitle+%3Ftitle+%3B%0D%0A++ov%3Acomposer+%3Fcomposer+.%0D%0A%3Fcomposer+foaf%3Aname+%3Fcomposer_name+.%0D%0A%0D%0A%23+must+have+same+key+as+well%0D%0A%3Fs2+sim%3Amethod+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fsame-key-sim>+%3B%0D%0A++sim%3Aelement+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F362>%3B%0D%0A++sim%3Aelement+%3Ftrack+.%0D%0A%0D%0A%23+must+have+composer+who+influenced+Wagner%0D%0A%23+not+we+could+include+a+line+like+the+one+below%2C+but+hard+coding+Wagner's+URI+turns+out+to+be%0D%0A%23++++a+significant+optimization+on+4Store%0D%0A%23+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F362>+ov%3Acomposer+%3Fc+.%0D%0A%23%0D%0A%3Fs3+sim%3Amethod+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fcmn-influence>+%3B%0D%0A++sim%3Aobject+<http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Fartist%2Feefd7c1e-abcf-4ccc-ba60-0fd435c9061f>+%3B%0D%0A++sim%3Asubject+%3Fcomp2+.%0D%0A%3Ftrack+ov%3Acomposer+%3Fcomp2.%0D%0A%0D%0A%23+only+return+results+with+a+distance+less+than+8.0%0D%0AFILTER+(+xsd%3Afloat(%3Fdist)+<+%228.0%22^^xsd%3Afloat+)+.%0D%0A%23+remove+the+seed+track+from+the+results%0D%0AFILTER+(!regex(str(%3Ftrack)%2C+%22http%3A%2F%2Fclassical.catfishsmooth.net%2Fresource%2Ftrack%2F362%22))%0D%0A}%0D%0AORDER+BY+ASC+(%3Fdist)">
+	Timbre sim, key sim, and influence</a></li>
+		</ul>
+    </div>
+
+
+    <div id="default-graph-section" class="section" style="margin-right: 12em">
+      <h2 style="display: inline">GRAPH:</h2>
+      <p style="display: inline">
+        Default graph.
+        <a href="?browse=graphs">List named graphs</a>
+      </p>
+    </div>
+
+    <div id="named-graph-section" class="section" style="margin-right: 12em">
+      <h2 style="display: inline">GRAPH:</h2>
+      <p style="display: inline">
+        <span id="selected-named-graph">Named graph goes here</span>.
+        <a href="javascript:snorql.switchToDefaultGraph()">Switch back to default graph</a>
+      </p>
+    </div>
+
+    <div class="section" style="margin-right: 12em">
+      <h2>SPARQL:</h2>
+      <pre id="prefixestext"></pre>
+      <form id="queryform" action="#" method="get"><div>
+        <input type="hidden" name="query" value="" id="query" />
+        <input type="hidden" name="output" value="json" id="jsonoutput" disabled="disabled" />
+        <input type="hidden" name="stylesheet" value="" id="stylesheet" disabled="disabled" />
+        <input type="hidden" name="graph" value="" id="graph-uri" disabled="disabled" />
+      </div></form>
+      <div>
+        <textarea name="query" rows="9" cols="80" id="querytext"></textarea>
+        Results:
+        <select id="selectoutput" onchange="snorql.updateOutputMode()">
+          <option selected="selected" value="browse">Browse</option>
+          <option value="json">as JSON</option>
+          <option value="xml">as XML</option>
+          <option value="xslt">as XML+XSLT</option>
+        </select>
+        <span id="xsltcontainer"><span id="xsltinput">
+          XSLT stylesheet URL:
+          <input id="xsltstylesheet" type="text" value="snorql/xml-to-html.xsl" size="30" />
+        </span></span>
+        <input type="button" value="Go!" onclick="snorql.submitQuery()" />
+        <input type="button" value="Reset" onclick="snorql.resetQuery()" />
+      </div>
+    </div>
+
+    <div class="section">
+      <div id="result"><span></span></div>
+    </div>
+
+    <div id="footer">Powered by <a id="poweredby" href="#">Snorql</a></div>
+  </body>
+</html>
