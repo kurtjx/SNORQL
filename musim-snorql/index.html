@@ -24,11 +24,14 @@
         <li><a class="graph-link" href="?browse=classes">Classes</a></li>
         <li><a class="graph-link" href="?browse=properties">Properties</a></li>
 	<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fg+WHERE+{+GRAPH+%3Fg+{+%3Fx+%3Fy+%3Fz+}+}">Graphs</a></li>
-	<li><a class="graph-link" 
-href="?query=SELECT+DISTINCT+%3Fcomposer_name+%3Ftrack_title+%3Faudio+WHERE+{%0D%0A++%3Ftrack+mo%3Aavailable_as+%3Faudio+.%0D%0A++%3Ftrack+ov%3Acomposer+%3Fcomposer+.+%0D%0A++%3Fcomposer+foaf%3Aname+%3Fcomposer_name+.+%0D%0A++%3Ftrack+dc%3Atitle+%3Ftrack_title+.%0D%0A}%0D%0Alimit+100">List 
-Tracks</a></li>
         <li id="browse-named-graphs-link"><a href="?browse=graphs">Named Graphs</a></li>
       </ul>
+	<br/>
+	<h2>Music:</h2>
+	<ul>
+			<li><a class="graph-link" href="?query=SELECT+DISTINCT+%3Fcomposer_name+%3Ftrack_title+%3Faudio+WHERE+%7B%0D%0A++%3Ftrack+mo%3Aavailable_as+%3Faudio+.%0D%0A++%3Ftrack+ov%3Acomposer+%3Fcomposer+.+%0D%0A++%3Fcomposer+foaf%3Aname+%3Fcomposer_name+.+%0D%0A++%3Ftrack+dc%3Atitle+%3Ftrack_title+.%0D%0A%7D%0D%0Alimit+100">List 
+		Tracks</a></li>
+	</ul>
 	<br/>
 	<h2>MuSim:</h2>
 		<ul>
