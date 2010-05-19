@@ -9,7 +9,9 @@ String.prototype.startsWith = function(str) {
 }
 
 function Snorql() {
+    // modify this._endpoint to point to your SPARQL endpoint
     this._endpoint = document.location.href.match(/^([^?]*)snorql\//)[1] + 'sparql';
+    // modify these to your likeing
     this._poweredByLink = 'http://www4.wiwiss.fu-berlin.de/bizer/d2r-server/';
     this._poweredByLabel = 'D2R Server';
     this._enableNamedGraphs = false;

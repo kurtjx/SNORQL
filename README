@@ -1,1 +1,11 @@
 SNORQL is an AJAXy front-end for exploring RDF SPARQL endpoints
+
+It was originally created by Richard Cyganaik ( http://richard.cyganiak.de/ )
+for the D2R server project ( http://www4.wiwiss.fu-berlin.de/bizer/d2r-server/ ).
+
+SNORQL can be used with just about any SPARQL endpoint that supports JSON. To
+use SNORQL simply put the ./snorql directory somwhere sensible in the Apache
+web directory and modify ./snorql/snorql.js to conform with your setup.  You
+can also modify the pre-defined namespaces in ./snorql/namespaces.js
+
+SNORQL is licensed under Apache-2 license (see ./LICENSE ).
