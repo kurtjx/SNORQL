@@ -40,6 +40,13 @@ function Snorql() {
         this._updateGraph(graph, false);
         var browse = queryString.match(/browse=([^&]*)/);
         var querytext = null;
+        if (browse && browse[1] == 'superclasses') {
+            var resultTitle = 'List of all super classes:';
+            var querytext = 'SELECT DISTINCT ?class\n' +
+                    'WHERE { [] rdfs:subClassOf ?class }\n' +
+                    'ORDER BY ?class';
+            var query = 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n' + querytext;
+        }
         if (browse && browse[1] == 'classes') {
             var resultTitle = 'List of all classes:';
             var query = 'SELECT DISTINCT ?class\n' +
