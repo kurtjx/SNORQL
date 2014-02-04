@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+        <relativePath />
+    </parent>
+
+    <packaging>jar</packaging>
+    <groupId>org.webjars</groupId>
+    <artifactId>snorql</artifactId>
+    <version>1.0.0</version>
+    <name>SNORQL Sparql Explorer</name>
+    <description>WebJar for SNORQL</description>
+    <url>https://github.com/kurtjx/SNORQL</url>
+
+    <developers>
+        <developer>
+            <id>kurtjx</id>
+            <url>https://github.com/kurtjx</url>
+        </developer>
+        <developer>
+            <name>Richard Cyganaik</name>
+            <url>http://richard.cyganiak.de/</url>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Jakob Frank</name>
+            <email>jakob.frank@salzburgresearch.at</email>
+            <url>https://github.com/ja-fra</url>
+            <organization>Salzburg Research Forschungsges.m.b.H</organization>
+            <organizationUrl>http://www.salzburgresearch.at/</organizationUrl>
+        </contributor>
+    </contributors>
+
+    <licenses>
+        <license>
+            <name>Apache-2 license</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>http://github.com/kurtjx/SNORQL</url>
+        <connection>scm:git:https://github.com/kurtjx/SNORQL.git</connection>
+        <developerConnection>scm:git:https://github.com/kurtjx/SNORQL.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencies>
+    </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <destDir>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</destDir>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.9</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>sonatype-nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/snorql</directory>
+                <targetPath>${destDir}</targetPath>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <targetPath>${project.build.outputDirectory}/META-INF</targetPath>
+                <filtering>false</filtering>
+                <includes>
+                    <include>README</include>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+</project>
