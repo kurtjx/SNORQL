@@ -9,6 +9,9 @@
     <script type="text/javascript" src="sparql.js"></script>
     <script type="text/javascript" src="namespaces.js"></script>
     <script type="text/javascript" src="snorql.js"></script>
+    <script type="text/javascript">
+        var snorql = new Snorql({'endpoint': document.location.href.match(/^([^?]*)snorql\//)[1] + 'sparql'});
+    </script>
   </head>
 
   <body class="snorql" onload="snorql.start()">
