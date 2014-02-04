@@ -9,6 +9,9 @@
     <script type="text/javascript" src="sparql.js"></script>
     <script type="text/javascript" src="namespaces.js"></script>
     <script type="text/javascript" src="snorql.js"></script>
+    <script type="text/javascript">
+        var snorql = new Snorql({'endpoint': 'http://localhost:8080/sparql/select'});
+    </script>
   </head>
 
   <body class="snorql" onload="snorql.start()">

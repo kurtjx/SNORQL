@@ -1,4 +1,3 @@
-var snorql = new Snorql();
 
 String.prototype.trim = function () {
     return this.replace(/^\s*/, "").replace(/\s*$/, "");
@@ -8,25 +7,26 @@ String.prototype.startsWith = function(str) {
 	return (this.match("^"+str) == str);
 }
 
-function Snorql() {
-    // modify this._endpoint to point to your SPARQL endpoint
-    this._endpoint = document.location.href.match(/^([^?]*)snorql\//)[1] + 'sparql';
-    // modify these to your likeing
-    this._poweredByLink = 'http://www4.wiwiss.fu-berlin.de/bizer/d2r-server/';
-    this._poweredByLabel = 'D2R Server';
-    this._enableNamedGraphs = false;
+function Snorql(options) {
+    options = options || {};
 
-    this._browserBase = null;
-    this._namespaces = {};
-    this._graph = null;
-    this._xsltDOM = null;
+    this._endpoint = options['endpoint'] || undefined;
+
+    this._poweredByLink = options['poweredByLink'] || 'http://www4.wiwiss.fu-berlin.de/bizer/d2r-server/';
+    this._poweredByLabel = options['poweredByLabel'] || 'D2R Server';
+    this._enableNamedGraphs = options['enableNamedGraphs'] || false;
+
+    this._browserBase = options['browserBase'] || null;
+    this._namespaces = options['namespaces'] || D2R_namespacePrefixes;
+    this._graph = options['graph'] || null;
+    this._xsltDOM = options['xsltDOM'] || null;
 
     this.start = function() {
         // TODO: Extract a QueryType class
         this.setBrowserBase(document.location.href.replace(/\?.*/, ''));
         this._displayEndpointURL();
         this._displayPoweredBy();
-        this.setNamespaces(D2R_namespacePrefixes);
+        this.setNamespaces(this._namespaces);
         this.updateOutputMode();
         var match = document.location.href.match(/\?(.*)/);
         var queryString = match ? match[1] : '';
@@ -104,6 +104,10 @@ function Snorql() {
         }
         document.getElementById('querytext').value = querytext;
         this.displayBusyMessage();
+        if (!this._endpoint) {
+            this.displayErrorMessage("No SPARQL Endpoint provided!");
+            return;
+        }
         var service = new SPARQL.Service(this._endpoint);
         if (this._graph) {
             service.addDefaultGraph(this._graph);
@@ -232,6 +236,10 @@ function Snorql() {
     }
 
     this.submitQuery = function() {
+        if (!this._endpoint) {
+            this.displayErrorMessage("No SPARQL Endpoint defined!");
+        }
+
         var mode = this._selectedOutputMode();
         if (mode == 'browse') {
             document.getElementById('queryform').action = this._browserBase;
