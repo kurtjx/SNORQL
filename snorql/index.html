@@ -10,7 +10,7 @@
     <script type="text/javascript" src="namespaces.js"></script>
     <script type="text/javascript" src="snorql.js"></script>
     <script type="text/javascript">
-        var snorql = new Snorql({'endpoint': 'http://localhost:8080/sparql/select'});
+        var snorql = new Snorql({'endpoint': document.location.href.match(/^([^?]*)snorql\//)[1] + 'sparql'});
     </script>
   </head>
 
