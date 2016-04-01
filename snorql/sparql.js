@@ -95,7 +95,10 @@ var SPARQL  = {}; // SPARQL namespace
  */
 SPARQL._query_transformations = {
 	query: function (o) { return o; },
-	ask: function (o) { return o["boolean"]; },
+	ask: function (o)
+	{
+		return o["boolean"];
+	},
 	selectValues: function (o) {
 		var v = o.head.vars[0]; // assume one variable
 		var values = [];
@@ -146,7 +149,7 @@ SPARQL.Service = function(endpoint) {
 	var _output = 'json';
 	var _max_simultaneous = 0;
 	var _request_headers = {};
-
+	
 	//----------
 	// accessors
 	this.endpoint = function() { return _endpoint; };
@@ -217,9 +220,9 @@ SPARQL.Service = function(endpoint) {
 	for (var query_form in SPARQL._query_transformations) {
 		// need the extra function to properly scope query_form (qf)
 		this[query_form] = (function(qf) {
-			return function(queryString, callback) {
+			return function(queryString, callback, sendAsMethod) {
 				var q = this.createQuery();
-				q._doQuery(queryString, callback, SPARQL._query_transformations[qf]);
+				q._doQuery(queryString, callback, SPARQL._query_transformations[qf], sendAsMethod);
 			};
 		})(query_form);
 	}
@@ -252,6 +255,7 @@ SPARQL.Query = function(service, priority) {
 	var _output = service.output();
 	var _priority = priority || 0;
 	var _request_headers = clone_obj(service.requestHeaders());
+	var _send_as = 'query';
 
 	//------------------
 	// private functions
@@ -307,9 +311,16 @@ SPARQL.Query = function(service, priority) {
         //alert(xhr.responseText);
 		SPARQL.statistics.successes++;
 		_service._markDone(this);
-		this._doCallback(arg.callback, 'success', arg.transformer(
-			_output == 'json' ? _create_json(xhr.responseText) : xhr.responseText
-		));
+		
+		var parsed_output = null;
+
+		if (_output == 'json')
+			parsed_output = _create_json(xhr.responseText);
+		
+		if (parsed_output == null)
+			parsed_output = xhr.responseText;
+		
+		this._doCallback(arg.callback, 'success', arg.transformer(parsed_output));
 	};
 	
 	function getXmlHttpRequest(url) {
@@ -317,7 +328,8 @@ SPARQL.Query = function(service, priority) {
 		return new XMLHttpRequest();
 	}
 	
-	this._doQuery = function(queryString, callback, transformer) {
+	this._doQuery = function(queryString, callback, transformer, sendAsMethod) {
+		_send_as = sendAsMethod;
 		_user_query = queryString;
 		if (_service._canRun()) {
 			try {
@@ -433,8 +445,8 @@ SPARQL.Query = function(service, priority) {
 		for (i = 0; i < this.namedGraphs().length; i++) urlQueryString += 'named-graph-uri=' + encodeURIComponent(this.namedGraphs()[i]) + '&';
 		
 		// specify JSON output (currently output= supported by latest Joseki) (or other output)
-		urlQueryString += 'output=' + _output + '&';
-		return urlQueryString + 'query=' + encodeURIComponent(this.queryString());
+		urlQueryString += 'output=' + _output + '&format=' + _output + '&';
+		return urlQueryString + _send_as + '=' + encodeURIComponent(this.queryString());
 	}
 	
     /**
