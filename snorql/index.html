@@ -43,16 +43,24 @@
     </div>
 
     <div class="section" style="margin-right: 12em">
-      <h2>SPARQL:</h2>
-      <pre id="prefixestext"></pre>
+      <h2>SPARQL: <input type="button" id="prefixes_button" value="Show Prefixes" onClick="showHidePrefixes();"/></h2>
+      <code id="prefixestext" class="prefixes" style="display:none;"></code>
       <form id="queryform" action="#" method="get"><div>
         <input type="hidden" name="query" value="" id="query" />
+        <input type="hidden" name="update" value="" id="update" disabled="disabled"/>
+        <input type="hidden" name="sendas" value="query" id="sendas" />
         <input type="hidden" name="output" value="json" id="jsonoutput" disabled="disabled" />
+        <input type="hidden" name="format" value="json" id="format" disabled="disabled" />
         <input type="hidden" name="stylesheet" value="" id="stylesheet" disabled="disabled" />
         <input type="hidden" name="graph" value="" id="graph-uri" disabled="disabled" />
       </div></form>
       <div>
         <textarea name="query" rows="9" cols="80" id="querytext"></textarea>
+        Send as:
+        <select id="selectsendas" onchange="snorql.updateOutputMode()">
+          <option selected="selected" value="query">Query</option>
+          <option value="update">Update</option>
+        </select>
         Results:
         <select id="selectoutput" onchange="snorql.updateOutputMode()">
           <option selected="selected" value="browse">Browse</option>

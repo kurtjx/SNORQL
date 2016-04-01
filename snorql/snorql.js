@@ -8,6 +8,23 @@ String.prototype.startsWith = function(str) {
 	return (this.match("^"+str) == str);
 }
 
+function showHidePrefixes()
+{
+	var prefixesButton = document.getElementById('prefixes_button');
+	var prefixesText = document.getElementById('prefixestext');
+	
+	if (prefixesButton.value == 'Show Prefixes')
+	{
+		prefixesText.style.display = 'block';
+		prefixesButton.value = 'Hide Prefixes'
+	}
+	else
+	{
+		prefixesText.style.display = 'none';
+		prefixesButton.value = 'Show Prefixes'
+	}
+}
+
 function Snorql() {
     // modify this._endpoint to point to your SPARQL endpoint
     this._endpoint = document.location.href.match(/^([^?]*)snorql\//)[1] + 'sparql';
@@ -20,6 +37,12 @@ function Snorql() {
     this._namespaces = {};
     this._graph = null;
     this._xsltDOM = null;
+
+    this.setNamespaces = function(namespaces) {
+        this._namespaces = namespaces;
+        var prefixesElement = document.createTextNode(this._getPrefixes());
+        this._display(prefixesElement, 'prefixestext');
+    }
 
     this.start = function() {
         // TODO: Extract a QueryType class
@@ -97,7 +120,44 @@ function Snorql() {
         if (queryString.match(/query=/)) {
             var resultTitle = 'SPARQL results:';
             querytext = this._betterUnescape(queryString.match(/query=([^&]*)/)[1]);
-            var query = prefixes + querytext;
+            
+            var this_prefixes = '';
+            
+            var prefix_array = prefixes.split('\n');
+            
+            for (var i = 0; i < prefix_array.length; i++)
+            {
+            	var prefix = prefix_array[i];
+            	
+            	if (querytext.indexOf(prefix) == -1)
+            		this_prefixes += prefix + '\n';
+            }
+			
+			var query_lines = querytext.split('\n');
+			
+			for (var i = 0; i < query_lines.length; i++)
+			{
+				var line = query_lines[i];
+				
+				if (line.match(/prefix/i))
+				{
+					var parts = line.split(' ');
+					
+					if (parts.length > 2 && parts[0].toUpperCase() == 'PREFIX')
+						this._namespaces[parts[1].replace(':', '')] = parts[2].substring(1, parts[2].length - 1);
+				}
+				else
+				{
+					break;
+				}
+			}
+            
+            var query = this_prefixes + querytext;
+        }
+		var sendAsMethod = "query";
+        if (queryString.match(/sendas=/)) {
+            sendAsMethod = queryString.match(/sendas=([^&]*)/)[1];
+			document.getElementById('selectsendas').value = sendAsMethod;
         }
         if (!querytext) {
             querytext = query;
@@ -116,7 +176,7 @@ function Snorql() {
    	    var match = exp.exec(querytext);
    	    if (match) {
 	        if (match[1].toUpperCase() == 'ASK') {
-	        	service.setOutput('boolean');
+	        	service.setOutput('json');
 	        	var successFunc = function(value) {
 	                dummy.displayBooleanResult(value, resultTitle);
 	            };
@@ -134,17 +194,23 @@ function Snorql() {
 	        }
    	    }
    	    
-        service.query(query, {
-            success: successFunc,
-            failure: function(report) {
-                var message = report.responseText.match(/<pre>([\s\S]*)<\/pre>/);
-                if (message) {
-                    dummy.displayErrorMessage(message[1]);
-                } else {
-                    dummy.displayErrorMessage(report.responseText);
-                }
-            }
-        });
+        service.query
+		(
+			query,
+			{
+				success: successFunc,
+				failure: function(report)
+				{
+					var message = report.responseText.match(/<pre>([\s\S]*)<\/pre>/);
+					if (message) {
+						dummy.displayErrorMessage(message[1]);
+					} else {
+						dummy.displayErrorMessage(report.responseText);
+					}
+				}
+			},
+			sendAsMethod
+		);
     }
 
     this.setBrowserBase = function(url) {
@@ -160,11 +226,6 @@ function Snorql() {
     this._displayPoweredBy = function() {
         $('poweredby').href = this._poweredByLink;
         $('poweredby').update(this._poweredByLabel);
-    }
-
-    this.setNamespaces = function(namespaces) {
-        this._namespaces = namespaces;
-        this._display(document.createTextNode(this._getPrefixes()), 'prefixestext');
     }
 
     this.switchToGraph = function(uri) {
@@ -236,10 +297,28 @@ function Snorql() {
         if (mode == 'browse') {
             document.getElementById('queryform').action = this._browserBase;
             document.getElementById('query').value = document.getElementById('querytext').value;
+            document.getElementById('sendas').value = document.getElementById('selectsendas').value;
+	        document.getElementById('format').disabled = true;
         } else {
-            document.getElementById('query').value = this._getPrefixes() + document.getElementById('querytext').value;
+			if (document.getElementById('selectsendas').value == 'update')
+			{
+				document.getElementById('query').disabled = true;
+				document.getElementById('update').disabled = false;
+				document.getElementById('update').value = this._getPrefixes() + document.getElementById('querytext').value;
+				document.getElementById('queryform').method = 'POST';
+			}
+			else
+			{
+				document.getElementById('query').disabled = false;
+				document.getElementById('update').disabled = true;
+				document.getElementById('query').value = this._getPrefixes() + document.getElementById('querytext').value;
+				document.getElementById('queryform').method = 'GET';
+			}
+			document.getElementById('sendas').disabled = true;
             document.getElementById('queryform').action = this._endpoint;
         }
+        document.getElementById('format').disabled = false;
+		document.getElementById('format').value = mode;
         document.getElementById('jsonoutput').disabled = (mode != 'json');
         document.getElementById('stylesheet').disabled = (mode != 'xslt' || !document.getElementById('xsltstylesheet').value);
         if (mode == 'xslt') {
@@ -266,10 +345,7 @@ function Snorql() {
         var title = document.createElement('h2');
         title.appendChild(document.createTextNode(resultTitle));
         div.appendChild(title);
-        if (value)
-        	div.appendChild(document.createTextNode("TRUE"));
-        else
-        	div.appendChild(document.createTextNode("FALSE"));
+		div.appendChild(document.createTextNode(value.boolean));
         this._display(div, 'result');
         this._updateGraph(this._graph); // refresh links in new result
     }
@@ -289,14 +365,27 @@ function Snorql() {
         var title = document.createElement('h2');
         title.appendChild(document.createTextNode(resultTitle));
         div.appendChild(title);
-        if (json.results.bindings.length == 0) {
-            var p = document.createElement('p');
-            p.className = 'empty';
-            p.appendChild(document.createTextNode('[no results]'));
-            div.appendChild(p);
-        } else {
-            div.appendChild(new SPARQLResultFormatter(json, this._namespaces).toDOM());
-        }
+		
+		if (json.results)
+		{
+			if (json.results.bindings.length == 0) {
+				var p = document.createElement('p');
+				p.className = 'empty';
+				p.appendChild(document.createTextNode('[no results]'));
+				div.appendChild(p);
+			} else {
+				var result = new SPARQLResultFormatter(json, this._namespaces).toDOM()
+				div.appendChild(result);
+			}
+		}
+		else
+		{
+			var p = document.createElement('p');
+			p.className = 'empty';
+			p.innerHTML = json;
+			div.appendChild(p);
+		}
+		
         this._display(div, 'result');
         this._updateGraph(this._graph); // refresh links in new result
     }
@@ -318,6 +407,10 @@ function Snorql() {
         return document.getElementById('selectoutput').value;
     }
 
+    this._selectedSendAs = function() {
+        return document.getElementById('selectsendas').value;
+    }
+
     this._getPrefixes = function() {
         prefixes = '';
         for (prefix in this._namespaces) {
@@ -328,7 +421,8 @@ function Snorql() {
     }
 
     this._betterUnescape = function(s) {
-        return unescape(s.replace(/\+/g, ' '));
+        return decodeURIComponent(s.replace(/\+/g, ' '));
+        //return unescape(s.replace(/\+/g, ' '));
     }
 }
 
@@ -359,13 +453,15 @@ function SPARQLResultFormatter(json, namespaces) {
     this._namespaces = namespaces;
 
     this.toDOM = function() {
-        var table = document.createElement('table');
-        table.className = 'queryresults';
+        var tableUp = document.createElement('table');
+        tableUp.className = 'queryresults';
+        var table= document.createElement('tbody');
+        tableUp.appendChild(table);
         table.appendChild(this._createTableHeader());
         for (var i = 0; i < this._results.length; i++) {
             table.appendChild(this._createTableRow(this._results[i], i));
         }
-        return table;
+        return tableUp;
     }
 
     // TODO: Refactor; non-standard link makers should be passed into the class by the caller
